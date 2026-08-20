@@ -1,0 +1,12 @@
+{
+  "name": "Gorila de Óculos",
+  "short_name": "Gorila Sax",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#07090d",
+  "theme_color": "#0d1117",
+  "description": "Mini jogo do gorila de óculos com modo armazém e igreja.",
+  "icons": [
+    { "src": "assets/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

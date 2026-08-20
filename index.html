@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0d1117" />
+  <meta name="description" content="Mini jogo do gorila de óculos: jogue a banana e veja o gorila trabalhar ou tocar sax." />
+  <title>Gorila de Óculos</title>
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" href="assets/icon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">🦍</div>
+        <div>
+          <strong>GORILA DE ÓCULOS</strong>
+          <span>arraste a banana e veja o que acontece</span>
+        </div>
+      </div>
+
+      <div class="scene-switch" role="group" aria-label="Escolher cenário">
+        <button class="scene-btn active" data-scene="warehouse" type="button">
+          <span class="scene-icon">▦</span>
+          <span>Armazém</span>
+        </button>
+        <button class="scene-btn" data-scene="church" type="button">
+          <span class="scene-icon">✦</span>
+          <span>Igreja</span>
+        </button>
+      </div>
+
+      <button id="soundToggle" class="icon-btn" type="button" aria-label="Ativar ou desativar som" title="Som ligado">
+        <span id="soundIcon">🔊</span>
+      </button>
+    </header>
+
+    <main>
+      <section id="game" class="game warehouse" aria-live="polite">
+        <div class="ambient ambient-a"></div>
+        <div class="ambient ambient-b"></div>
+
+        <div class="hud">
+          <div class="hud-pill">
+            <span class="hud-label">Cenário</span>
+            <strong id="sceneName">Armazém de Telemetria</strong>
+          </div>
+          <div class="hud-pill score-pill">
+            <span class="hud-label">Bananas entregues</span>
+            <strong id="score">0</strong>
+          </div>
+        </div>
+
+        <div class="instructions" id="instructionText">
+          Arraste a banana até o gorila para ele guardar um módulo de telemetria na caixa.
+        </div>
+
+        <div class="scene-stage">
+          <div class="warehouse-scene scene-layer" aria-hidden="true">
+            <div class="warehouse-backwall"></div>
+            <div class="warehouse-sign">CENTRAL DE TELEMETRIA</div>
+            <div class="rack rack-left">
+              <div class="rack-level"><span class="part tire"></span><span class="part sensor"></span><span class="part filter"></span></div>
+              <div class="rack-level"><span class="part brake"></span><span class="part module-mini"></span><span class="part cable"></span></div>
+              <div class="rack-level"><span class="part axle"></span><span class="part sensor"></span><span class="part module-mini"></span></div>
+            </div>
+            <div class="rack rack-right">
+              <div class="rack-level"><span class="part module-mini"></span><span class="part cable"></span><span class="part filter"></span></div>
+              <div class="rack-level"><span class="part tire"></span><span class="part sensor"></span><span class="part brake"></span></div>
+              <div class="rack-level"><span class="part axle"></span><span class="part module-mini"></span><span class="part cable"></span></div>
+            </div>
+            <div class="warehouse-floor"></div>
+            <div class="shipping-box" id="shippingBox">
+              <div class="box-label">TELEMETRIA<br><b>EXPEDIÇÃO</b></div>
+              <div class="box-flap flap-a"></div>
+              <div class="box-flap flap-b"></div>
+            </div>
+            <div class="telemetry-module" id="telemetryModule">
+              <div class="module-led"></div>
+              <div class="module-port p1"></div>
+              <div class="module-port p2"></div>
+              <div class="module-name">TM-500</div>
+              <small>MÓDULO DE TELEMETRIA</small>
+            </div>
+          </div>
+
+          <div class="church-scene scene-layer" aria-hidden="true">
+            <div class="church-wall"></div>
+            <div class="stained-glass sg-left"></div>
+            <div class="stained-glass sg-right"></div>
+            <div class="cross-glow"></div>
+            <div class="cross"><i></i><b></b></div>
+            <div class="pews pews-left"></div>
+            <div class="pews pews-right"></div>
+            <div class="altar"></div>
+            <div class="note-cloud" id="noteCloud">
+              <span>♪</span><span>♫</span><span>♬</span><span>♪</span>
+            </div>
+          </div>
+
+          <div id="gorillaTarget" class="gorilla-wrap" aria-label="Gorila de óculos">
+            <svg class="gorilla" viewBox="0 0 560 640" role="img" aria-label="Gorila de óculos animado">
+              <defs>
+                <linearGradient id="fur" x1="0" x2="1">
+                  <stop offset="0" stop-color="#101317"/>
+                  <stop offset="0.55" stop-color="#2c3238"/>
+                  <stop offset="1" stop-color="#111418"/>
+                </linearGradient>
+                <linearGradient id="fur2" x1="0" x2="1">
+                  <stop offset="0" stop-color="#313840"/>
+                  <stop offset="1" stop-color="#15191f"/>
+                </linearGradient>
+                <linearGradient id="skin" x1="0" x2="1">
+                  <stop offset="0" stop-color="#25292f"/>
+                  <stop offset="1" stop-color="#111317"/>
+                </linearGradient>
+                <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%">
+                  <feDropShadow dx="0" dy="10" stdDeviation="12" flood-opacity=".42"/>
+                </filter>
+              </defs>
+
+              <ellipse class="g-shadow" cx="285" cy="595" rx="210" ry="34" fill="#000" opacity=".28"/>
+
+              <g class="gorilla-body" filter="url(#shadow)">
+                <path d="M136 547C124 447 149 354 208 306c37-30 117-31 163 0 59 40 83 137 69 241z" fill="url(#fur)"/>
+                <path d="M117 518c-14-93-6-164 48-207 31-25 69-19 83 16 12 30-10 68-22 114l-21 102z" fill="url(#fur2)"/>
+                <path d="M443 518c14-93 6-164-48-207-31-25-69-19-83 16-12 30 10 68 22 114l21 102z" fill="url(#fur2)"/>
+                <ellipse cx="276" cy="244" rx="128" ry="135" fill="url(#fur)"/>
+                <ellipse cx="277" cy="265" rx="102" ry="82" fill="url(#skin)"/>
+                <path d="M204 219c21-50 44-71 76-71 40 0 73 31 91 79-36-25-62-34-86-34-32 0-53 5-81 26z" fill="#0f1215"/>
+                <ellipse cx="244" cy="248" rx="13" ry="9" fill="#0a0b0d"/>
+                <ellipse cx="315" cy="248" rx="13" ry="9" fill="#0a0b0d"/>
+                <ellipse cx="244" cy="247" rx="4" ry="4" fill="#e8eef4" opacity=".85"/>
+                <ellipse cx="315" cy="247" rx="4" ry="4" fill="#e8eef4" opacity=".85"/>
+                <path d="M259 274c10-12 24-12 34 0l12 20c-9 15-54 15-62 0z" fill="#12151a"/>
+                <path d="M238 313c31 15 65 15 88 0-11 34-76 38-88 0z" fill="#090b0e" opacity=".85"/>
+
+                <g class="glasses" fill="none" stroke="#111" stroke-width="12">
+                  <rect x="190" y="215" width="92" height="68" rx="18"/>
+                  <rect x="287" y="215" width="92" height="68" rx="18"/>
+                  <path d="M282 241h9"/>
+                  <path d="M190 233l-43-17M379 233l43-17"/>
+                </g>
+                <g fill="none" stroke="#49515b" stroke-width="3" opacity=".9">
+                  <rect x="190" y="215" width="92" height="68" rx="18"/>
+                  <rect x="287" y="215" width="92" height="68" rx="18"/>
+                </g>
+
+                <g class="arm arm-left">
+                  <path d="M169 349c-48 28-78 73-83 142-2 34 18 56 48 54 36-2 50-32 52-67 2-33 14-61 37-82z" fill="url(#fur2)"/>
+                  <ellipse cx="123" cy="526" rx="43" ry="33" fill="url(#skin)"/>
+                </g>
+                <g class="arm arm-right">
+                  <path d="M390 349c48 28 78 73 83 142 2 34-18 56-48 54-36-2-50-32-52-67-2-33-14-61-37-82z" fill="url(#fur2)"/>
+                  <ellipse cx="436" cy="526" rx="43" ry="33" fill="url(#skin)"/>
+                </g>
+              </g>
+
+              <g class="sax-prop">
+                <path d="M297 304c36 20 65 52 72 88" fill="none" stroke="#d99a22" stroke-width="18" stroke-linecap="round"/>
+                <path d="M366 389c13 81 6 137-24 164-32 28-88 17-105-22" fill="none" stroke="#e2a52c" stroke-width="22" stroke-linecap="round"/>
+                <ellipse cx="227" cy="518" rx="45" ry="32" fill="#d89a22" stroke="#f4c76a" stroke-width="8"/>
+                <g fill="#f3d284">
+                  <circle cx="330" cy="355" r="6"/><circle cx="348" cy="390" r="6"/><circle cx="354" cy="426" r="6"/><circle cx="347" cy="461" r="6"/>
+                </g>
+              </g>
+
+              <g class="warehouse-prop">
+                <rect x="373" y="478" width="86" height="56" rx="12" fill="#1b2530" stroke="#f0642e" stroke-width="5"/>
+                <rect x="384" y="490" width="25" height="10" rx="4" fill="#59d98e"/>
+                <circle cx="438" cy="497" r="6" fill="#f1c75b"/>
+                <path d="M383 519h65" stroke="#66798d" stroke-width="5" stroke-linecap="round"/>
+              </g>
+            </svg>
+          </div>
+
+          <div id="bananaHome" class="banana-home">
+            <div id="banana" class="banana" role="button" tabindex="0" aria-label="Banana. Arraste até o gorila.">
+              <svg viewBox="0 0 180 140" aria-hidden="true">
+                <defs>
+                  <linearGradient id="bananaFill" x1="0" x2="1">
+                    <stop offset="0" stop-color="#f6c735"/>
+                    <stop offset=".55" stop-color="#ffe66d"/>
+                    <stop offset="1" stop-color="#d99914"/>
+                  </linearGradient>
+                </defs>
+                <path d="M31 33c29 56 82 71 128 41-14 47-53 68-92 58C38 125 16 97 18 65c1-12 4-23 13-32z" fill="url(#bananaFill)" stroke="#6d4b08" stroke-width="5"/>
+                <path d="M29 34c-3-10 1-19 9-24" fill="none" stroke="#6d4b08" stroke-width="9" stroke-linecap="round"/>
+                <path d="M157 76c8-3 14-7 17-13" fill="none" stroke="#6d4b08" stroke-width="8" stroke-linecap="round"/>
+                <path d="M50 69c24 29 62 37 91 19" fill="none" stroke="#fff2a4" stroke-width="7" stroke-linecap="round" opacity=".6"/>
+              </svg>
+            </div>
+            <div class="drag-hint">ARRASTE A BANANA</div>
+          </div>
+
+          <div id="hitFlash" class="hit-flash"></div>
+          <div id="actionMessage" class="action-message"></div>
+        </div>
+
+        <div class="bottom-panel">
+          <div class="status-card">
+            <span class="status-dot"></span>
+            <div>
+              <small id="modeLabel">MODO ARMAZÉM</small>
+              <strong id="modeAction">Banana → módulo guardado</strong>
+            </div>
+          </div>
+          <button id="resetBtn" class="secondary-btn" type="button">Recomeçar</button>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <audio id="saxAudio" src="assets/sax-riff.wav" preload="auto"></audio>
+  <script src="app.js"></script>
+</body>
+</html>
