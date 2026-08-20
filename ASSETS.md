@@ -1,19 +1,12 @@
-# Créditos de mídia
+# Bruno — assets da v10
 
-## Solo real de sax
-O modo Igreja usa um trecho do arquivo **Stlouisblues-9bars.ogg** ("St. Louis Blues - 9 bars, tenor saxophone"), performance de **Julien Grandgagnage**, disponibilizada no Wikimedia Commons sob **CC BY-SA 3.0**. A composição de W. C. Handy está em domínio público nos Estados Unidos.
+## Sax local
+A v10 não depende mais de áudio externo em tempo de execução.
+O solo é um pequeno riff original renderizado localmente para o jogo e incluído em dois formatos:
+- `assets/sax-solo.m4a` — prioridade para iPhone/Safari
+- `assets/sax-solo.mp3` — fallback para outros navegadores
 
-Página do arquivo:
-https://commons.wikimedia.org/wiki/File:Stlouisblues-9bars.ogg
+O áudio é disparado via Web Audio API após o primeiro gesto do usuário. Isso evita bloqueios de autoplay e atrasos de rede no celular.
 
-Licença da performance:
-https://creativecommons.org/licenses/by-sa/3.0/
-
-O jogo toca o arquivo hospedado pelo Wikimedia Commons sem embutir ou redistribuir o áudio no pacote.
-
-## Arte do jogo
-Bruno, banana, sax, cenários e animações desta versão são vetores construídos diretamente no HTML/CSS/SVG do projeto; não dependem dos assets gráficos usados nas versões anteriores.
-
-
-## Áudio local de voz
-- `assets/bruno-e-demais.mp3`: fala curta em português gerada localmente para garantir reprodução em iPhone/Android após o gesto do usuário.
+## Voz
+A fala em áudio “Bruno é demais” foi removida na v10 para eliminar o segundo gatilho de áudio que estava falhando no iPhone. O texto continua aparecendo em balão após a ação.

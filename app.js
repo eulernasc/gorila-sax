@@ -20,7 +20,6 @@
   const speechBubble = document.getElementById('brunoSpeech');
   const noteCloud = document.getElementById('noteCloud');
   const saxAudio = document.getElementById('saxAudio');
-  const voiceAudio = document.getElementById('voiceAudio');
   const telemetryModule = document.getElementById('telemetryModule');
   const shippingBox = document.getElementById('shippingBox');
   const rightArm = document.getElementById('rightArmRig');
@@ -31,22 +30,69 @@
   let dragging = false;
   let busy = false;
   let lastDrop = null;
-  let voices = [];
   let audioCtx = null;
+  let saxBuffer = null;
+  let saxBufferPromise = null;
+  let saxSource = null;
+  let saxGain = null;
+  let saxFallbackPlaying = false;
 
   scoreEl.textContent = String(score);
   applyScene(scene, true);
   updateSoundUI();
 
-  if ('speechSynthesis' in window) {
-    const refreshVoices = () => { voices = speechSynthesis.getVoices(); };
-    refreshVoices();
-    speechSynthesis.addEventListener?.('voiceschanged', refreshVoices);
+  // Áudio v10: tudo local e sem voz sintetizada.
+  // O arquivo do sax fica dentro do próprio PWA e é pré-carregado.
+  // No primeiro toque do usuário, o AudioContext é desbloqueado; depois o
+  // solo pode começar alguns segundos mais tarde sem depender de autoplay.
+  preloadSaxBytes();
+
+  function preloadSaxBytes() {
+    if (saxBufferPromise) return saxBufferPromise;
+    saxBufferPromise = fetch('./assets/sax-solo.m4a', { cache: 'force-cache' })
+      .then(r => { if (!r.ok) throw new Error(`sax HTTP ${r.status}`); return r.arrayBuffer(); })
+      .then(bytes => decodeSax(bytes))
+      .catch(async err => {
+        console.warn('M4A do sax não carregou; tentando MP3 local.', err);
+        const r = await fetch('./assets/sax-solo.mp3', { cache: 'force-cache' });
+        if (!r.ok) throw new Error(`sax MP3 HTTP ${r.status}`);
+        return decodeSax(await r.arrayBuffer());
+      })
+      .catch(err => { console.error('Falha ao preparar sax local:', err); return null; });
+    return saxBufferPromise;
   }
 
-  // Pré-carrega sem bloquear a aplicação.
-  try { saxAudio.load(); } catch (_) {}
-  try { voiceAudio.load(); } catch (_) {}
+  function getAudioContext() {
+    if (audioCtx) return audioCtx;
+    const Ctx = window.AudioContext || window.webkitAudioContext;
+    if (!Ctx) return null;
+    audioCtx = new Ctx();
+    return audioCtx;
+  }
+
+  async function decodeSax(bytes) {
+    const ctx = getAudioContext();
+    if (!ctx) return null;
+    // slice evita problemas de buffer reutilizado em alguns Safaris.
+    saxBuffer = await ctx.decodeAudioData(bytes.slice(0));
+    return saxBuffer;
+  }
+
+  function unlockMobileAudio() {
+    if (!soundOn) return;
+    const ctx = getAudioContext();
+    if (!ctx) return;
+    try {
+      if (ctx.state !== 'running') ctx.resume().catch(() => {});
+      // Pulso silencioso curto para efetivamente abrir a saída de áudio no iOS.
+      const b = ctx.createBuffer(1, 1, ctx.sampleRate);
+      const src = ctx.createBufferSource();
+      const g = ctx.createGain();
+      g.gain.value = 0;
+      src.buffer = b; src.connect(g).connect(ctx.destination); src.start(0);
+    } catch (_) {}
+    preloadSaxBytes();
+  }
 
   function applyScene(next, force = false) {
     if (!force && (busy || next === scene)) return;
@@ -81,7 +127,7 @@
     localStorage.setItem('brunoSoundV5', soundOn ? 'on' : 'off');
     updateSoundUI();
     if (!soundOn) stopAllAudio();
-    else warmAudioOutput();
+    else unlockMobileAudio();
   });
 
   resetBtn.addEventListener('click', () => {
@@ -92,46 +138,10 @@
     showMessage('Bruno está pronto de novo!');
   });
 
-  // A correção principal para iPhone:
-  // os DOIS elementos de áudio começam a tocar MUDOS no mesmo gesto em que a
-  // banana é solta no Bruno. Depois apenas reposicionamos e desmutamos; não
-  // fazemos um novo play tardio que o Safari possa bloquear.
-  function primeAudioSession() {
-    if (!soundOn) return;
-    warmAudioOutput();
-    primeElement(saxAudio, true);
-    primeElement(voiceAudio, true);
-  }
-
-  function primeElement(el, loop) {
-    if (!el) return;
-    try {
-      el.pause();
-      el.loop = !!loop;
-      el.muted = true;
-      el.volume = 1;
-      try { el.currentTime = 0; } catch (_) {}
-      const p = el.play();
-      if (p && typeof p.catch === 'function') p.catch(() => {});
-    } catch (_) {}
-  }
-
-  function warmAudioOutput() {
-    try {
-      const Ctx = window.AudioContext || window.webkitAudioContext;
-      if (!Ctx) return;
-      audioCtx ||= new Ctx();
-      if (audioCtx.state === 'suspended') audioCtx.resume().catch(() => {});
-      const o = audioCtx.createOscillator();
-      const g = audioCtx.createGain();
-      g.gain.value = 0.000001;
-      o.connect(g).connect(audioCtx.destination);
-      o.start(); o.stop(audioCtx.currentTime + 0.02);
-    } catch (_) {}
-  }
 
   banana.addEventListener('pointerdown', e => {
     if (busy) return;
+    unlockMobileAudio();
     e.preventDefault();
     dragging = true;
     banana.classList.add('dragging');
@@ -159,7 +169,7 @@
   banana.addEventListener('keydown', e => {
     if ((e.key === 'Enter' || e.key === ' ') && !busy) {
       e.preventDefault();
-      primeAudioSession();
+      unlockMobileAudio();
       success();
     }
   });
@@ -183,7 +193,7 @@
     if (hit) {
       lastDrop = { x, y };
       // IMPORTANTE: ainda estamos dentro do pointerup do usuário.
-      primeAudioSession();
+      unlockMobileAudio();
       success();
     } else miss();
   }
@@ -257,12 +267,12 @@
   async function churchSequence() {
     showMessage('Bruno vai pegar o sax…');
     game.classList.add('sax-ready');
-    await wait(780);
+    await wait(520);
 
     showMessage('Agora sim: solo de sax!');
     game.classList.add('sax-playing');
     noteCloud.classList.add('playing');
-    startSaxNow();
+    await startSaxNow();
 
     await wait(6100);
     stopSaxOnly();
@@ -273,23 +283,48 @@
     await wait(400);
   }
 
-  function startSaxNow() {
-    if (!soundOn || !saxAudio) return;
+  async function startSaxNow() {
+    if (!soundOn) return false;
+    unlockMobileAudio();
+    const ctx = getAudioContext();
     try {
-      saxAudio.loop = false;
-      // O áudio já está tocando mudo desde o drop. Reiniciar o tempo não exige novo gesto.
-      try { saxAudio.currentTime = 0; } catch (_) {}
-      saxAudio.muted = false;
-      saxAudio.volume = 1;
-      if (saxAudio.paused) {
-        const p = saxAudio.play();
-        if (p && typeof p.catch === 'function') p.catch(() => playFallbackRiff());
+      const buffer = saxBuffer || await Promise.race([preloadSaxBytes(), wait(1400).then(() => null)]);
+      if (buffer && ctx) {
+        if (ctx.state !== 'running') await ctx.resume().catch(() => {});
+        if (ctx.state === 'running') {
+          stopSaxOnly();
+          saxGain = ctx.createGain();
+          saxGain.gain.value = 0.95;
+          saxSource = ctx.createBufferSource();
+          saxSource.buffer = buffer;
+          saxSource.connect(saxGain).connect(ctx.destination);
+          saxSource.start(0);
+          return true;
+        }
       }
-    } catch (_) { playFallbackRiff(); }
+    } catch (err) { console.warn('WebAudio sax falhou:', err); }
+
+    // Fallback local simples. Como o arquivo já foi carregado pelo PWA,
+    // evita depender de internet e nunca trava a animação.
+    try {
+      saxAudio.pause();
+      saxAudio.currentTime = 0;
+      saxAudio.muted = false;
+      const playPromise = saxAudio.play();
+      if (playPromise) await Promise.race([playPromise, wait(900)]);
+      saxFallbackPlaying = !saxAudio.paused;
+      if (saxFallbackPlaying) return true;
+    } catch (err) { console.warn('HTMLAudio sax falhou:', err); }
+
+    playFallbackRiff();
+    return false;
   }
 
   function stopSaxOnly() {
-    try { saxAudio.pause(); saxAudio.loop = false; saxAudio.muted = false; saxAudio.currentTime = 0; } catch (_) {}
+    if (saxSource) { try { saxSource.stop(); } catch (_) {} try { saxSource.disconnect(); } catch (_) {} saxSource = null; }
+    if (saxGain) { try { saxGain.disconnect(); } catch (_) {} saxGain = null; }
+    try { saxAudio.pause(); saxAudio.currentTime = 0; saxAudio.muted = false; } catch (_) {}
+    saxFallbackPlaying = false;
   }
 
   async function warehouseSequence() {
@@ -341,47 +376,16 @@
   }
 
   async function brunoSays() {
+    // A fala foi removida de propósito na v10: era o segundo gatilho de áudio
+    // que mais falhava no Safari/iPhone. Mantemos só o balão visual.
     const phrase = 'Bruno é demais!';
     speechBubble.textContent = phrase;
     speechBubble.classList.add('show');
     game.classList.add('bruno-speaking');
     showMessage(phrase);
-
-    if (soundOn) {
-      const ok = startVoiceNow();
-      if (!ok) speakPhrase(phrase);
-    }
-    await wait(1900);
+    await wait(1200);
     speechBubble.classList.remove('show');
     game.classList.remove('bruno-speaking');
-  }
-
-  function startVoiceNow() {
-    if (!voiceAudio) return false;
-    try {
-      // Este elemento ficou em loop, mudo, desde o drop. Só revelamos a fala agora.
-      voiceAudio.loop = false;
-      try { voiceAudio.currentTime = 0; } catch (_) {}
-      voiceAudio.muted = false;
-      voiceAudio.volume = 1;
-      if (voiceAudio.paused) {
-        const p = voiceAudio.play();
-        if (p && typeof p.catch === 'function') p.catch(() => speakPhrase('Bruno é demais!'));
-      }
-      return true;
-    } catch (_) { return false; }
-  }
-
-  function speakPhrase(text) {
-    if (!('speechSynthesis' in window)) return;
-    try {
-      speechSynthesis.cancel();
-      const u = new SpeechSynthesisUtterance(text);
-      u.lang = 'pt-BR'; u.rate = .92; u.pitch = .78; u.volume = 1;
-      const pt = (voices.length ? voices : speechSynthesis.getVoices()).filter(v => /^pt(-|_)/i.test(v.lang || ''));
-      u.voice = pt.find(v => /brasil|brazil|antonio|antônio|daniel|ricardo/i.test(v.name || '')) || pt[0] || null;
-      speechSynthesis.speak(u);
-    } catch (_) {}
   }
 
   function resetPose() {
@@ -390,14 +394,12 @@
     shippingBox.classList.remove('receive');
     telemetryModule.style.opacity = '';
     stopAllAudio();
-    if ('speechSynthesis' in window) speechSynthesis.cancel();
     speechBubble.classList.remove('show');
     banana.style.opacity = '';
   }
 
   function stopAllAudio() {
-    try { saxAudio.pause(); saxAudio.loop=false; saxAudio.muted=false; saxAudio.currentTime=0; } catch (_) {}
-    try { voiceAudio.pause(); voiceAudio.loop=false; voiceAudio.muted=false; voiceAudio.currentTime=0; } catch (_) {}
+    stopSaxOnly();
   }
 
   function flashHit() {
