@@ -38,6 +38,10 @@
   let audioCtx = null;
   let voiceBuffer = null;
   let voiceBufferPromise = null;
+  let saxBuffer = null;
+  let saxBufferPromise = null;
+  let saxBufferSource = null;
+  let audioUnlockPromise = null;
   let lastDrop = null;
 
   scoreEl.textContent = String(score);
@@ -102,53 +106,57 @@
   });
 
   function unlockAudio() {
-    if (audioUnlocked || !soundOn) return;
+    if (!soundOn) return Promise.resolve(false);
+    if (audioUnlockPromise) return audioUnlockPromise;
 
-    // iPhone/Safari: cada elemento de mídia que será tocado depois é iniciado
-    // brevemente dentro do gesto do usuário. Assim o sax e a fala ficam liberados.
-    const prime = el => {
-      if (!el) return;
+    // iPhone/Safari: o primeiro toque na banana vira o "gesto mestre" de áudio.
+    // Nele abrimos o AudioContext e já começamos a preparar os DOIS sons que serão
+    // usados mais tarde (solo e fala). Depois disso todo o fluxo usa o mesmo contexto.
+    audioUnlockPromise = (async () => {
       try {
-        el.pause();
-        try { el.currentTime = 0; } catch (_) {}
-        el.volume = 0.001;
-        const p = el.play();
-        if (p && typeof p.then === 'function') {
-          p.then(() => {
-            setTimeout(() => {
-              el.pause();
-              try { el.currentTime = 0; } catch (_) {}
-              el.volume = 1;
-            }, 120);
-          }).catch(() => { el.volume = 1; });
-        } else {
-          el.pause();
-          try { el.currentTime = 0; } catch (_) {}
-          el.volume = 1;
-        }
-      } catch (_) { try { el.volume = 1; } catch (_) {} }
-    };
+        const ctx = ensureAudioContext();
+        if (!ctx) throw new Error('WebAudio indisponível');
+        if (ctx.state === 'suspended') await ctx.resume();
 
-    prime(saxAudio);
-    prime(voiceAudio);
-
-    // Também desbloqueia WebAudio para os efeitos locais.
-    try {
-      const AudioCtx = window.AudioContext || window.webkitAudioContext;
-      if (AudioCtx) {
-        audioCtx ||= new AudioCtx();
-        if (audioCtx.state === 'suspended') audioCtx.resume().catch?.(() => {});
-        const oscillator = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        gain.gain.value = 0.00001;
-        oscillator.connect(gain).connect(audioCtx.destination);
+        // Pulso praticamente mudo para garantir a abertura da saída de áudio do iOS.
+        const oscillator = ctx.createOscillator();
+        const gain = ctx.createGain();
+        gain.gain.value = 0.000001;
+        oscillator.connect(gain).connect(ctx.destination);
         oscillator.start();
-        oscillator.stop(audioCtx.currentTime + 0.02);
-        prepareVoiceBuffer();
-      }
-    } catch (_) {}
+        oscillator.stop(ctx.currentTime + 0.025);
 
-    audioUnlocked = true;
+        // Decodifica antecipadamente. A voz é local; o sax real é buscado uma única vez
+        // e passa a tocar pelo WebAudio, começando exatamente no primeiro sample.
+        await Promise.allSettled([prepareVoiceBuffer(), prepareSaxBuffer()]);
+        audioUnlocked = true;
+        return true;
+      } catch (_) {
+        // Fallback: libera também os <audio> tradicionais no próprio gesto.
+        const prime = el => {
+          if (!el) return;
+          try {
+            el.pause();
+            el.currentTime = 0;
+            el.muted = true;
+            const p = el.play();
+            Promise.resolve(p).then(() => {
+              setTimeout(() => {
+                el.pause();
+                try { el.currentTime = 0; } catch (_) {}
+                el.muted = false;
+              }, 80);
+            }).catch(() => { el.muted = false; });
+          } catch (_) { try { el.muted = false; } catch (_) {} }
+        };
+        prime(saxAudio);
+        prime(voiceAudio);
+        audioUnlocked = true;
+        return false;
+      }
+    })();
+
+    return audioUnlockPromise;
   }
 
   banana.addEventListener('pointerdown', e => {
@@ -272,32 +280,73 @@
     game.classList.add('sax-ready');
     await wait(780);
 
+    // Antes da animação de tocar, aguarda a preparação do áudio iniciada no primeiro toque.
+    // No celular isso evita começar no meio do arquivo por streaming tardio.
+    if (soundOn) await waitForAudioReady(3200);
+
     showMessage('Agora sim: solo de sax!');
     game.classList.add('sax-playing');
     noteCloud.classList.add('playing');
     const started = await playRealSax();
     if (!started) playFallbackRiff();
     await wait(6100);
-    saxAudio.pause();
+    stopSaxPlayback();
     game.classList.remove('sax-playing');
     noteCloud.classList.remove('playing');
     await wait(300);
     game.classList.remove('sax-ready');
-    await wait(650);
+
+    // Pequeno respiro natural entre o último sopro do sax e a fala.
+    await wait(400);
   }
 
   async function playRealSax() {
     if (!soundOn) return true;
+
+    // Principal: buffer WebAudio. Como o arquivo inteiro já foi decodificado, não existe
+    // "stream começando atrasado" e o solo sempre inicia em 0.000 s.
+    try {
+      const ctx = ensureAudioContext();
+      if (ctx) {
+        if (ctx.state === 'suspended') await ctx.resume();
+        const buffer = saxBuffer || await prepareSaxBuffer();
+        if (buffer) {
+          stopSaxPlayback();
+          const source = ctx.createBufferSource();
+          const gain = ctx.createGain();
+          source.buffer = buffer;
+          gain.gain.setValueAtTime(0.0001, ctx.currentTime);
+          gain.gain.linearRampToValueAtTime(1, ctx.currentTime + 0.035);
+          source.connect(gain).connect(ctx.destination);
+          source.start(0, 0);
+          saxBufferSource = source;
+          source.onended = () => { if (saxBufferSource === source) saxBufferSource = null; };
+          return true;
+        }
+      }
+    } catch (_) {}
+
+    // Fallback para navegadores sem WebAudio/CORS.
     try {
       saxAudio.pause();
-      // Começa do início. A versão anterior pulava 2 s e no celular parecia que o solo já começava cortado.
       try { saxAudio.currentTime = 0; } catch (_) {}
+      saxAudio.muted = false;
       saxAudio.volume = 1;
       await saxAudio.play();
       return true;
     } catch (_) {
       return false;
     }
+  }
+
+  function stopSaxPlayback() {
+    if (saxBufferSource) {
+      try { saxBufferSource.stop(); } catch (_) {}
+      try { saxBufferSource.disconnect(); } catch (_) {}
+      saxBufferSource = null;
+    }
+    saxAudio.pause();
+    try { saxAudio.currentTime = 0; } catch (_) {}
   }
 
   async function warehouseSequence() {
@@ -371,33 +420,38 @@
   async function playBrunoVoice() {
     if (!soundOn) return false;
 
-    // Caminho principal no celular: WebAudio já foi desbloqueado no primeiro toque
-    // da banana, então a fala pode sair alguns segundos depois sem ser barrada pelo iOS.
+    // Primeiro tenta o mesmo AudioContext já desbloqueado pela banana.
+    // Esperamos explicitamente o context ficar "running" antes de disparar a voz.
     try {
       const ctx = ensureAudioContext();
       if (ctx) {
+        if (ctx.state === 'suspended') await ctx.resume();
         const buffer = voiceBuffer || await prepareVoiceBuffer();
-        if (buffer) {
+        if (buffer && ctx.state === 'running') {
           const source = ctx.createBufferSource();
           const gain = ctx.createGain();
           source.buffer = buffer;
-          gain.gain.value = 1;
+          gain.gain.setValueAtTime(0.0001, ctx.currentTime);
+          gain.gain.linearRampToValueAtTime(1, ctx.currentTime + 0.02);
           source.connect(gain).connect(ctx.destination);
           await new Promise(resolve => {
-            source.onended = resolve;
-            source.start(0);
-            setTimeout(resolve, Math.max(2300, buffer.duration * 1000 + 450));
+            let finished = false;
+            const done = () => { if (!finished) { finished = true; resolve(); } };
+            source.onended = done;
+            source.start(0, 0);
+            setTimeout(done, Math.max(2400, buffer.duration * 1000 + 500));
           });
           return true;
         }
       }
     } catch (_) {}
 
-    // Fallback: elemento de áudio local, também previamente liberado no gesto.
+    // Fallback: elemento local previamente liberado no primeiro toque.
     if (!voiceAudio) return false;
     try {
       voiceAudio.pause();
       try { voiceAudio.currentTime = 0; } catch (_) {}
+      voiceAudio.muted = false;
       voiceAudio.volume = 1;
       const ended = new Promise(resolve => {
         let done = false;
@@ -418,6 +472,32 @@
     } catch (_) {
       return false;
     }
+  }
+
+  function prepareSaxBuffer() {
+    if (saxBuffer) return Promise.resolve(saxBuffer);
+    if (saxBufferPromise) return saxBufferPromise;
+    const ctx = ensureAudioContext();
+    if (!ctx) return Promise.resolve(null);
+    const sourceUrl = saxAudio?.querySelector('source[type="audio/mpeg"]')?.src || saxAudio?.currentSrc;
+    if (!sourceUrl) return Promise.resolve(null);
+    saxBufferPromise = fetch(sourceUrl, { mode: 'cors', cache: 'force-cache' })
+      .then(r => { if (!r.ok) throw new Error('sax fetch'); return r.arrayBuffer(); })
+      .then(buf => ctx.decodeAudioData(buf.slice(0)))
+      .then(decoded => (saxBuffer = decoded))
+      .catch(() => null);
+    return saxBufferPromise;
+  }
+
+  async function waitForAudioReady(timeoutMs = 3000) {
+    if (!soundOn) return;
+    const timeout = new Promise(resolve => setTimeout(resolve, timeoutMs));
+    try {
+      await Promise.race([
+        Promise.allSettled([unlockAudio(), prepareVoiceBuffer(), prepareSaxBuffer()]),
+        timeout
+      ]);
+    } catch (_) {}
   }
 
   function prepareVoiceBuffer() {
@@ -453,8 +533,7 @@
     noteCloud.classList.remove('playing');
     shippingBox.classList.remove('receive');
     telemetryModule.style.opacity = '';
-    saxAudio.pause();
-    try { saxAudio.currentTime = 0; } catch (_) {}
+    stopSaxPlayback();
     if (voiceAudio) {
       voiceAudio.pause();
       try { voiceAudio.currentTime = 0; } catch (_) {}
@@ -514,7 +593,6 @@
       const Ctx=window.AudioContext||window.webkitAudioContext;
       if(!Ctx)return null;
       audioCtx ||= new Ctx();
-      if(audioCtx.state==='suspended') audioCtx.resume();
       return audioCtx;
     }catch(_){return null;}
   }
