@@ -13,3 +13,7 @@ O jogo toca o arquivo hospedado pelo Wikimedia Commons sem embutir ou redistribu
 
 ## Arte do jogo
 Bruno, banana, sax, cenários e animações desta versão são vetores construídos diretamente no HTML/CSS/SVG do projeto; não dependem dos assets gráficos usados nas versões anteriores.
+
+
+## Áudio local de voz
+- `assets/bruno-e-demais.mp3`: fala curta em português gerada localmente para garantir reprodução em iPhone/Android após o gesto do usuário.

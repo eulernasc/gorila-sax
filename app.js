@@ -21,6 +21,7 @@
   const speechBubble = document.getElementById('brunoSpeech');
   const noteCloud = document.getElementById('noteCloud');
   const saxAudio = document.getElementById('saxAudio');
+  const voiceAudio = document.getElementById('voiceAudio');
   const telemetryModule = document.getElementById('telemetryModule');
   const shippingBox = document.getElementById('shippingBox');
   const leftArm = document.getElementById('leftArmRig');
@@ -35,6 +36,8 @@
   let voices = [];
   let audioUnlocked = false;
   let audioCtx = null;
+  let voiceBuffer = null;
+  let voiceBufferPromise = null;
   let lastDrop = null;
 
   scoreEl.textContent = String(score);
@@ -47,8 +50,9 @@
     speechSynthesis.addEventListener?.('voiceschanged', refreshVoices);
   }
 
-  // Preload the real sax recording as soon as the browser allows it.
+  // Preload both clips. iOS may ignore preload, so we also prime them on the first touch.
   saxAudio.load();
+  voiceAudio?.load();
 
   function applyScene(next, force = false) {
     if (!force && (busy || next === scene)) return;
@@ -100,29 +104,35 @@
   function unlockAudio() {
     if (audioUnlocked || !soundOn) return;
 
-    // IMPORTANTE PARA iPhone: play() é chamado imediatamente dentro do gesto,
-    // antes de qualquer await. Isso registra este elemento de áudio como liberado.
-    try {
-      saxAudio.pause();
-      saxAudio.currentTime = 0;
-      saxAudio.volume = 0.001;
-      const playPromise = saxAudio.play();
-      if (playPromise && typeof playPromise.then === 'function') {
-        playPromise.then(() => {
-          setTimeout(() => {
-            saxAudio.pause();
-            try { saxAudio.currentTime = 0; } catch (_) {}
-            saxAudio.volume = 1;
-            audioUnlocked = true;
-          }, 70);
-        }).catch(() => { saxAudio.volume = 1; });
-      } else {
-        saxAudio.pause();
-        saxAudio.volume = 1;
-        audioUnlocked = true;
-      }
-    } catch (_) { saxAudio.volume = 1; }
+    // iPhone/Safari: cada elemento de mídia que será tocado depois é iniciado
+    // brevemente dentro do gesto do usuário. Assim o sax e a fala ficam liberados.
+    const prime = el => {
+      if (!el) return;
+      try {
+        el.pause();
+        try { el.currentTime = 0; } catch (_) {}
+        el.volume = 0.001;
+        const p = el.play();
+        if (p && typeof p.then === 'function') {
+          p.then(() => {
+            setTimeout(() => {
+              el.pause();
+              try { el.currentTime = 0; } catch (_) {}
+              el.volume = 1;
+            }, 120);
+          }).catch(() => { el.volume = 1; });
+        } else {
+          el.pause();
+          try { el.currentTime = 0; } catch (_) {}
+          el.volume = 1;
+        }
+      } catch (_) { try { el.volume = 1; } catch (_) {} }
+    };
 
+    prime(saxAudio);
+    prime(voiceAudio);
+
+    // Também desbloqueia WebAudio para os efeitos locais.
     try {
       const AudioCtx = window.AudioContext || window.webkitAudioContext;
       if (AudioCtx) {
@@ -134,8 +144,11 @@
         oscillator.connect(gain).connect(audioCtx.destination);
         oscillator.start();
         oscillator.stop(audioCtx.currentTime + 0.02);
+        prepareVoiceBuffer();
       }
     } catch (_) {}
+
+    audioUnlocked = true;
   }
 
   banana.addEventListener('pointerdown', e => {
@@ -277,7 +290,8 @@
     if (!soundOn) return true;
     try {
       saxAudio.pause();
-      saxAudio.currentTime = 2.0; // avoids the very first pickup and starts in the musical phrase
+      // Começa do início. A versão anterior pulava 2 s e no celular parecia que o solo já começava cortado.
+      try { saxAudio.currentTime = 0; } catch (_) {}
       saxAudio.volume = 1;
       await saxAudio.play();
       return true;
@@ -339,10 +353,84 @@
     speechBubble.classList.add('show');
     game.classList.add('bruno-speaking');
     showMessage(phrase);
-    if (soundOn) speakPhrase(phrase);
-    await wait(1650);
+
+    if (soundOn) {
+      const played = await playBrunoVoice();
+      if (!played) {
+        speakPhrase(phrase);
+        await wait(1850);
+      }
+    } else {
+      await wait(1650);
+    }
+
     speechBubble.classList.remove('show');
     game.classList.remove('bruno-speaking');
+  }
+
+  async function playBrunoVoice() {
+    if (!soundOn) return false;
+
+    // Caminho principal no celular: WebAudio já foi desbloqueado no primeiro toque
+    // da banana, então a fala pode sair alguns segundos depois sem ser barrada pelo iOS.
+    try {
+      const ctx = ensureAudioContext();
+      if (ctx) {
+        const buffer = voiceBuffer || await prepareVoiceBuffer();
+        if (buffer) {
+          const source = ctx.createBufferSource();
+          const gain = ctx.createGain();
+          source.buffer = buffer;
+          gain.gain.value = 1;
+          source.connect(gain).connect(ctx.destination);
+          await new Promise(resolve => {
+            source.onended = resolve;
+            source.start(0);
+            setTimeout(resolve, Math.max(2300, buffer.duration * 1000 + 450));
+          });
+          return true;
+        }
+      }
+    } catch (_) {}
+
+    // Fallback: elemento de áudio local, também previamente liberado no gesto.
+    if (!voiceAudio) return false;
+    try {
+      voiceAudio.pause();
+      try { voiceAudio.currentTime = 0; } catch (_) {}
+      voiceAudio.volume = 1;
+      const ended = new Promise(resolve => {
+        let done = false;
+        const finish = () => {
+          if (done) return;
+          done = true;
+          voiceAudio.removeEventListener('ended', finish);
+          voiceAudio.removeEventListener('error', finish);
+          resolve();
+        };
+        voiceAudio.addEventListener('ended', finish, { once: true });
+        voiceAudio.addEventListener('error', finish, { once: true });
+        setTimeout(finish, 2600);
+      });
+      await voiceAudio.play();
+      await ended;
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  function prepareVoiceBuffer() {
+    if (voiceBuffer) return Promise.resolve(voiceBuffer);
+    if (voiceBufferPromise) return voiceBufferPromise;
+    const ctx = ensureAudioContext();
+    if (!ctx) return Promise.resolve(null);
+    voiceBufferPromise = fetch('./assets/bruno-e-demais.mp3', { cache: 'force-cache' })
+      .then(r => { if (!r.ok) throw new Error('voice fetch'); return r.arrayBuffer(); })
+      .then(buf => ctx.decodeAudioData(buf.slice(0)))
+      .then(decoded => (voiceBuffer = decoded))
+      .catch(() => null);
+    return voiceBufferPromise;
   }
 
   function speakPhrase(text) {
@@ -367,6 +455,10 @@
     telemetryModule.style.opacity = '';
     saxAudio.pause();
     try { saxAudio.currentTime = 0; } catch (_) {}
+    if (voiceAudio) {
+      voiceAudio.pause();
+      try { voiceAudio.currentTime = 0; } catch (_) {}
+    }
     if ('speechSynthesis' in window) speechSynthesis.cancel();
     speechBubble.classList.remove('show');
     banana.style.opacity = '';
