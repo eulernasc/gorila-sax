@@ -2,9 +2,9 @@
 <html lang="pt-BR">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#080b10" />
-  <meta name="description" content="Bruno, o gorila de óculos: jogue a banana e veja Bruno trabalhar com telemetria ou tocar sax." />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
+  <meta name="theme-color" content="#090c10" />
+  <meta name="description" content="Bruno, o gorila de óculos: jogue a banana e veja o que acontece no armazém ou na igreja." />
   <title>Bruno — Gorila de Óculos</title>
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="icon" href="assets/icon.svg" type="image/svg+xml" />
@@ -14,186 +14,242 @@
   <div class="app-shell">
     <header class="topbar">
       <div class="brand">
-        <div class="brand-mark" aria-hidden="true">
-          <span class="brand-glasses"></span>
+        <div class="brand-icon" aria-hidden="true">
+          <span class="lens"></span><span class="bridge"></span><span class="lens"></span>
         </div>
-        <div class="brand-copy">
+        <div>
           <strong>BRUNO</strong>
-          <span>O gorila de óculos • telemetria & sax</span>
+          <span>o gorila de óculos</span>
         </div>
       </div>
 
       <div class="scene-switch" role="group" aria-label="Escolher cenário">
-        <button class="scene-btn active" data-scene="warehouse" type="button">
-          <span class="scene-icon warehouse-mini" aria-hidden="true"></span>
-          <span>Armazém</span>
-        </button>
-        <button class="scene-btn" data-scene="church" type="button">
-          <span class="scene-icon church-mini" aria-hidden="true"></span>
-          <span>Igreja</span>
-        </button>
+        <button class="scene-btn active" data-scene="warehouse" type="button"><span>▦</span> Armazém</button>
+        <button class="scene-btn" data-scene="church" type="button"><span>✦</span> Igreja</button>
       </div>
 
-      <button id="soundToggle" class="sound-btn" type="button" aria-label="Ativar ou desativar som" title="Som e voz ligados">
-        <span class="sound-wave" aria-hidden="true"></span>
-        <span id="soundLabel">Som</span>
+      <button id="soundToggle" class="sound-btn" type="button" aria-label="Ativar ou desativar o som">
+        <span class="speaker">◖)))</span><span id="soundLabel">Som</span>
       </button>
     </header>
 
-    <main>
-      <section id="game" class="game warehouse" aria-live="polite">
-        <div class="ambient ambient-a"></div>
-        <div class="ambient ambient-b"></div>
+    <main id="game" class="game warehouse">
+      <div class="hud">
+        <div class="hud-card">
+          <small>CENÁRIO</small>
+          <strong id="sceneName">Armazém de Telemetria</strong>
+        </div>
+        <div class="hud-card score-card">
+          <small>BANANAS</small>
+          <strong id="score">0</strong>
+        </div>
+      </div>
 
-        <div class="hud">
-          <div class="hud-pill scene-status">
-            <span class="hud-label">Bruno está no</span>
-            <strong id="sceneName">Armazém de Telemetria</strong>
+      <div class="instruction" id="instructionText">Arraste a banana até o Bruno.</div>
+
+      <section class="stage" id="stage">
+        <div class="scene scene-warehouse" aria-hidden="true">
+          <div class="wh-back"></div>
+          <div class="wh-lamp lamp-a"></div>
+          <div class="wh-lamp lamp-b"></div>
+          <div class="wh-sign"><b>CENTRAL DE TELEMETRIA</b><span>BRUNO • EXPEDIÇÃO</span></div>
+          <div class="wh-rack rack-left"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+          <div class="wh-rack rack-right"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+          <div class="wh-floor"></div>
+          <div class="wh-lines"></div>
+          <div id="shippingBox" class="shipping-box">
+            <span class="box-top"></span>
+            <span class="box-tape"></span>
+            <b>TELEMETRIA</b>
+            <small>EXPEDIÇÃO</small>
           </div>
-          <div class="hud-pill score-pill">
-            <span class="hud-label">Bananas entregues</span>
-            <strong id="score">0</strong>
+          <div id="telemetryModule" class="telemetry-module">
+            <span class="tm-led"></span>
+            <span class="tm-screen">TM-500</span>
+            <span class="tm-line"></span>
+            <small>MÓDULO</small>
           </div>
         </div>
 
-        <div class="instructions" id="instructionText">
-          Arraste a banana até o Bruno para ele guardar um módulo de telemetria na caixa.
+        <div class="scene scene-church" aria-hidden="true">
+          <div class="ch-wall"></div>
+          <div class="ch-arch arch-left"></div>
+          <div class="ch-arch arch-center"></div>
+          <div class="ch-arch arch-right"></div>
+          <div class="beam beam-left"></div>
+          <div class="beam beam-right"></div>
+          <div class="stained stained-left"><span></span></div>
+          <div class="stained stained-right"><span></span></div>
+          <div class="cross-glow"></div>
+          <div class="cross"><span></span><b></b></div>
+          <div class="pews pews-left"></div>
+          <div class="pews pews-right"></div>
+          <div class="aisle"></div>
+          <div class="altar"><span>BRUNO • SAX SESSION</span></div>
+          <div id="noteCloud" class="note-cloud"><span>♪</span><span>♫</span><span>♬</span><span>♪</span><span>♫</span></div>
         </div>
 
-        <div class="scene-stage">
-          <div class="warehouse-scene scene-layer" aria-hidden="true">
-            <div class="warehouse-backwall"></div>
-            <div class="warehouse-light light-one"></div>
-            <div class="warehouse-light light-two"></div>
-            <div class="warehouse-sign"><b>BRUNO</b><span>CENTRAL DE TELEMETRIA</span></div>
-            <div class="truck-silhouette">
-              <span class="truck-cab"></span><span class="truck-body"></span><span class="truck-wheel w1"></span><span class="truck-wheel w2"></span>
-            </div>
-            <div class="rack rack-left">
-              <div class="rack-header">PEÇAS DE CAMINHÃO</div>
-              <div class="rack-level"><span class="part tire"></span><span class="part sensor"></span><span class="part filter"></span></div>
-              <div class="rack-level"><span class="part brake"></span><span class="part module-mini"></span><span class="part cable"></span></div>
-              <div class="rack-level"><span class="part axle"></span><span class="part sensor"></span><span class="part module-mini"></span></div>
-            </div>
-            <div class="rack rack-right">
-              <div class="rack-header">TELEMETRIA</div>
-              <div class="rack-level"><span class="part module-mini"></span><span class="part cable"></span><span class="part filter"></span></div>
-              <div class="rack-level"><span class="part tire"></span><span class="part sensor"></span><span class="part brake"></span></div>
-              <div class="rack-level"><span class="part axle"></span><span class="part module-mini"></span><span class="part cable"></span></div>
-            </div>
-            <div class="warehouse-floor"></div>
-            <div class="floor-marker">EXPEDIÇÃO</div>
-            <div class="shipping-box" id="shippingBox">
-              <div class="box-tape"></div>
-              <div class="box-label"><span>BRUNO</span>TELEMETRIA<br><b>EXPEDIÇÃO</b></div>
-              <div class="box-flap flap-a"></div>
-              <div class="box-flap flap-b"></div>
-            </div>
-            <div class="telemetry-module" id="telemetryModule">
-              <div class="module-antenna"></div>
-              <div class="module-led"></div>
-              <div class="module-screen">ONLINE</div>
-              <div class="module-port p1"></div>
-              <div class="module-port p2"></div>
-              <div class="module-name">TM-500</div>
-              <small>MÓDULO DE TELEMETRIA</small>
-            </div>
-          </div>
+        <div id="gorillaTarget" class="bruno-wrap" aria-label="Bruno, o gorila de óculos">
+          <div class="nameplate"><strong>BRUNO</strong><small>GORILA DE ÓCULOS</small></div>
+          <div id="brunoSpeech" class="speech-bubble">Bruno é demais!</div>
 
-          <div class="church-scene scene-layer" aria-hidden="true">
-            <div class="church-wall"></div>
-            <div class="church-arch arch-a"></div>
-            <div class="church-arch arch-b"></div>
-            <div class="church-arch arch-c"></div>
-            <div class="church-beam beam-left"></div>
-            <div class="church-beam beam-right"></div>
-            <div class="stained-glass sg-left"><i></i></div>
-            <div class="stained-glass sg-right"><i></i></div>
-            <div class="cross-glow"></div>
-            <div class="cross"><i></i><b></b></div>
-            <div class="altar"><span>BRUNO • SAX SESSION</span></div>
-            <div class="church-aisle"></div>
-            <div class="pews pews-left"></div>
-            <div class="pews pews-right"></div>
-            <div class="note-cloud" id="noteCloud">
-              <span>♪</span><span>♫</span><span>♬</span><span>♪</span><span>♫</span>
-            </div>
-          </div>
+          <svg id="brunoSvg" class="bruno-svg" viewBox="0 0 640 760" role="img" aria-label="Bruno, gorila animado em 2D">
+            <defs>
+              <linearGradient id="furGrad" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" stop-color="#232a31"/>
+                <stop offset=".5" stop-color="#0f1419"/>
+                <stop offset="1" stop-color="#05080b"/>
+              </linearGradient>
+              <linearGradient id="chestGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stop-color="#454b50"/>
+                <stop offset="1" stop-color="#252b30"/>
+              </linearGradient>
+              <linearGradient id="muzzleGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stop-color="#5c6267"/>
+                <stop offset="1" stop-color="#373c40"/>
+              </linearGradient>
+              <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" stop-color="#fff0a6"/>
+                <stop offset=".22" stop-color="#f9c846"/>
+                <stop offset=".55" stop-color="#c98b10"/>
+                <stop offset=".8" stop-color="#ffdf69"/>
+                <stop offset="1" stop-color="#8a5600"/>
+              </linearGradient>
+              <linearGradient id="lens" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" stop-color="#c7e9ff" stop-opacity=".26"/>
+                <stop offset=".5" stop-color="#15212c" stop-opacity=".32"/>
+                <stop offset="1" stop-color="#9fc9df" stop-opacity=".19"/>
+              </linearGradient>
+              <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%">
+                <feDropShadow dx="0" dy="16" stdDeviation="14" flood-color="#000" flood-opacity=".45"/>
+              </filter>
+            </defs>
 
-          <div id="gorillaTarget" class="gorilla-wrap" aria-label="Bruno, o gorila de óculos">
-            <div class="bruno-nameplate"><span>BRUNO</span><small>GORILA DE ÓCULOS</small></div>
-            <div id="brunoSpeech" class="bruno-speech" aria-live="assertive">Bruno é demais!</div>
+            <ellipse class="ground-shadow" cx="322" cy="703" rx="228" ry="30" fill="#000" opacity=".35"/>
 
-            <svg class="gorilla" viewBox="0 0 560 640" role="img" aria-label="Bruno, o gorila de óculos animado em estilo 2D">
-              <defs>
-                <filter id="brunoShadow" x="-35%" y="-35%" width="170%" height="170%">
-                  <feDropShadow dx="0" dy="14" stdDeviation="14" flood-opacity=".42"/>
-                </filter>
-                <linearGradient id="glassesLens" x1="0" y1="0" x2="1" y2="1">
-                  <stop offset="0" stop-color="#b9d8eb" stop-opacity=".27"/>
-                  <stop offset=".5" stop-color="#17232d" stop-opacity=".18"/>
-                  <stop offset="1" stop-color="#8fbad2" stop-opacity=".23"/>
-                </linearGradient>
-              </defs>
+            <g id="brunoRig" filter="url(#shadow)">
+              <g id="legsRig">
+                <path d="M168 626c-26 15-47 42-47 69 0 20 20 31 48 31h113c21 0 32-10 32-27 0-25-31-60-62-73z" fill="url(#furGrad)"/>
+                <path d="M472 626c26 15 47 42 47 69 0 20-20 31-48 31H358c-21 0-32-10-32-27 0-25 31-60 62-73z" fill="url(#furGrad)"/>
+                <path d="M126 697c18-13 43-17 73-10 20 5 41 18 63 35H160c-29 0-43-7-34-25z" fill="#31383e"/>
+                <path d="M514 697c-18-13-43-17-73-10-20 5-41 18-63 35h102c29 0 43-7 34-25z" fill="#31383e"/>
+              </g>
 
-              <ellipse class="g-shadow" cx="280" cy="590" rx="205" ry="28" fill="#000" opacity=".34"/>
+              <g id="torsoRig">
+                <path d="M168 362c20-80 83-118 152-118s132 38 152 118l25 168c7 51-25 117-177 117S136 581 143 530z" fill="url(#furGrad)"/>
+                <path d="M217 390c14-62 50-89 103-89s89 27 103 89l13 142c5 47-23 89-116 89s-121-42-116-89z" fill="url(#chestGrad)"/>
+                <path d="M242 398c19 18 42 28 78 28s59-10 78-28" fill="none" stroke="#737a80" stroke-width="10" stroke-linecap="round" opacity=".2"/>
+              </g>
 
-              <g class="bruno-art" filter="url(#brunoShadow)">
-                <image class="bruno-gorilla-art" href="assets/bruno-gorilla-base.png" x="50" y="36" width="460" height="573" preserveAspectRatio="xMidYMid meet"/>
-
-                <g class="warehouse-prop module-in-hand">
-                  <rect x="374" y="465" width="92" height="63" rx="12" fill="#101922" stroke="#f0642e" stroke-width="5"/>
-                  <rect x="388" y="480" width="29" height="10" rx="4" fill="#45db91"/>
-                  <circle cx="448" cy="486" r="5" fill="#f1c75b"/>
-                  <path d="M390 510h61" stroke="#74889b" stroke-width="5" stroke-linecap="round"/>
-                  <text x="420" y="504" fill="#dfe9f1" font-size="9" font-weight="900" text-anchor="middle">TM-500</text>
-                </g>
-
-                <g class="sax-prop sax-image-wrap">
-                  <image class="sax-image" href="assets/saxophone-cc0.png" x="278" y="234" width="148" height="345" preserveAspectRatio="xMidYMid meet"/>
-                  <g class="sax-hands" fill="#1a2026" stroke="#0a0d10" stroke-width="3">
-                    <ellipse cx="334" cy="372" rx="24" ry="18" transform="rotate(-13 331 325)"/>
-                    <ellipse cx="352" cy="458" rx="25" ry="18" transform="rotate(10 350 414)"/>
-                  </g>
-                </g>
-
-                <g class="glasses-overlay">
-                  <path d="M176 185l-34-12M384 185l34-12" fill="none" stroke="#06090d" stroke-width="11" stroke-linecap="round"/>
-                  <rect x="176" y="162" width="99" height="68" rx="18" fill="url(#glassesLens)" stroke="#080b0f" stroke-width="11"/>
-                  <rect x="285" y="162" width="99" height="68" rx="18" fill="url(#glassesLens)" stroke="#080b0f" stroke-width="11"/>
-                  <path d="M275 187h10" stroke="#080b0f" stroke-width="10" stroke-linecap="round"/>
-                  <path d="M192 174h30M301 174h30" stroke="#d9edf8" stroke-width="4" stroke-linecap="round" opacity=".18"/>
+              <g id="leftArmRig" class="arm left-arm">
+                <path d="M174 372c-58 10-98 49-111 119l-33 142c-8 35 9 63 38 69 28 6 52-10 61-42l39-120 51-106c15-32-3-68-45-62z" fill="url(#furGrad)"/>
+                <g id="leftHandRig" class="hand left-hand">
+                  <ellipse cx="103" cy="654" rx="51" ry="45" fill="#2e353b"/>
+                  <path d="M70 647c8-27 20-46 36-57M91 660c5-25 16-43 31-58M115 664c3-22 10-38 24-50" fill="none" stroke="#0c1115" stroke-width="8" stroke-linecap="round" opacity=".72"/>
                 </g>
               </g>
-            </svg>
-          </div>
 
-          <div id="bananaHome" class="banana-home">
-            <div id="banana" class="banana" role="button" tabindex="0" aria-label="Banana. Arraste até Bruno.">
-              <img class="banana-art" src="assets/banana-cc0.png" alt="" draggable="false" />
-            </div>
-            <div class="drag-hint">JOGUE A BANANA NO BRUNO</div>
-          </div>
+              <g id="rightArmRig" class="arm right-arm">
+                <path d="M466 372c58 10 98 49 111 119l33 142c8 35-9 63-38 69-28 6-52-10-61-42l-39-120-51-106c-15-32 3-68 45-62z" fill="url(#furGrad)"/>
+                <g id="rightHandRig" class="hand right-hand">
+                  <ellipse cx="537" cy="654" rx="51" ry="45" fill="#2e353b"/>
+                  <path d="M570 647c-8-27-20-46-36-57M549 660c-5-25-16-43-31-58M525 664c-3-22-10-38-24-50" fill="none" stroke="#0c1115" stroke-width="8" stroke-linecap="round" opacity=".72"/>
+                </g>
+              </g>
 
-          <div id="hitFlash" class="hit-flash"></div>
-          <div id="actionMessage" class="action-message"></div>
+              <g id="headRig" class="head-rig">
+                <ellipse cx="320" cy="235" rx="151" ry="159" fill="url(#furGrad)"/>
+                <ellipse cx="180" cy="250" rx="39" ry="48" fill="#171d22"/>
+                <ellipse cx="460" cy="250" rx="39" ry="48" fill="#171d22"/>
+                <ellipse cx="320" cy="270" rx="103" ry="94" fill="url(#muzzleGrad)"/>
+                <path d="M236 188c24-25 52-37 84-37s60 12 84 37" fill="none" stroke="#05080b" stroke-width="24" stroke-linecap="round"/>
+                <path d="M264 222c13-13 29-18 47-14M329 208c18-4 34 1 47 14" fill="none" stroke="#0b0e11" stroke-width="13" stroke-linecap="round"/>
+                <ellipse cx="286" cy="235" rx="15" ry="13" fill="#0a0d10"/>
+                <ellipse cx="354" cy="235" rx="15" ry="13" fill="#0a0d10"/>
+                <circle cx="290" cy="231" r="4" fill="#f5fbff"/>
+                <circle cx="358" cy="231" r="4" fill="#f5fbff"/>
+                <path d="M277 270c9-18 24-27 43-27s34 9 43 27c-8 19-22 29-43 29s-35-10-43-29z" fill="#11161a"/>
+                <ellipse cx="300" cy="269" rx="8" ry="6" fill="#3f474d"/>
+                <ellipse cx="340" cy="269" rx="8" ry="6" fill="#3f474d"/>
+                <g id="mouthRig" class="mouth-rig">
+                  <path id="mouthClosed" d="M270 321c27 20 73 20 100 0" fill="none" stroke="#171a1d" stroke-width="12" stroke-linecap="round"/>
+                  <ellipse id="mouthOpen" cx="320" cy="324" rx="48" ry="26" fill="#171014" opacity="0"/>
+                  <path id="mouthSmile" d="M284 325c20 12 52 12 72 0" fill="none" stroke="#8d7373" stroke-width="4" stroke-linecap="round" opacity="0"/>
+                </g>
+              </g>
+
+              <g id="glassesRig" class="glasses-rig">
+                <path d="M188 224l-46-15M452 224l46-15" fill="none" stroke="#05080b" stroke-width="12" stroke-linecap="round"/>
+                <rect x="201" y="196" width="109" height="82" rx="22" fill="url(#lens)" stroke="#070a0e" stroke-width="12"/>
+                <rect x="330" y="196" width="109" height="82" rx="22" fill="url(#lens)" stroke="#070a0e" stroke-width="12"/>
+                <path d="M310 224h20" stroke="#070a0e" stroke-width="11" stroke-linecap="round"/>
+                <path d="M220 211h30M349 211h30" stroke="#d8efff" stroke-width="4" stroke-linecap="round" opacity=".23"/>
+              </g>
+
+              <g id="saxRig" class="sax-rig" aria-hidden="true">
+                <!-- Sax alto construído no próprio SVG. No estado final o bocal termina exatamente na boca do Bruno. -->
+                <path class="sax-neck" d="M365 322c28 1 48 16 51 48" fill="none" stroke="url(#gold)" stroke-width="22" stroke-linecap="round"/>
+                <path d="M345 320l24 2" stroke="#2b1a08" stroke-width="11" stroke-linecap="round"/>
+                <path class="sax-body" d="M416 370c-3 72-1 147 8 207 7 47 27 78 58 80 34 2 58-23 54-54-4-34-29-52-62-49" fill="none" stroke="url(#gold)" stroke-width="36" stroke-linecap="round" stroke-linejoin="round"/>
+                <path class="sax-highlight" d="M407 372c-2 72 0 143 8 202" fill="none" stroke="#fff2a0" stroke-width="7" stroke-linecap="round" opacity=".68"/>
+                <path class="sax-bell" d="M474 547c45-18 89-2 113 34-36 11-64 31-80 59-21-16-34-48-33-93z" fill="url(#gold)" stroke="#8b5b05" stroke-width="6"/>
+                <ellipse cx="562" cy="581" rx="43" ry="18" transform="rotate(12 562 581)" fill="#2b1a08" stroke="#f2cb53" stroke-width="9"/>
+                <path d="M430 397l42 2M430 438l42 1M433 480l41-1M437 522l39-3" stroke="#7b4b02" stroke-width="5"/>
+                <path d="M462 392v142" stroke="#ae7610" stroke-width="4"/>
+                <g fill="#f6dc70" stroke="#7a4b00" stroke-width="4">
+                  <circle cx="465" cy="405" r="11"/><circle cx="465" cy="446" r="11"/><circle cx="467" cy="487" r="11"/><circle cx="470" cy="528" r="11"/>
+                </g>
+                <g class="sax-hand left-sax-hand">
+                  <ellipse cx="423" cy="439" rx="31" ry="24" fill="#30373d" stroke="#0a0e11" stroke-width="5"/>
+                  <path d="M404 434l38-4M405 446l38-3" stroke="#11161a" stroke-width="5" stroke-linecap="round"/>
+                </g>
+                <g class="sax-hand right-sax-hand">
+                  <ellipse cx="438" cy="524" rx="31" ry="24" fill="#30373d" stroke="#0a0e11" stroke-width="5"/>
+                  <path d="M419 519l38-4M420 531l38-3" stroke="#11161a" stroke-width="5" stroke-linecap="round"/>
+                </g>
+              </g>
+            </g>
+          </svg>
         </div>
 
-        <div class="bottom-panel">
-          <div class="status-card">
-            <span class="status-dot"></span>
-            <div>
-              <small id="modeLabel">MODO ARMAZÉM</small>
-              <strong id="modeAction">Bruno guarda o módulo na expedição</strong>
-            </div>
-          </div>
-          <button id="resetBtn" class="secondary-btn" type="button">Zerar bananas</button>
+        <div id="bananaHome" class="banana-home">
+          <svg id="banana" class="banana" viewBox="0 0 180 120" role="button" tabindex="0" aria-label="Banana. Arraste até Bruno.">
+            <defs>
+              <linearGradient id="bananaGold" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" stop-color="#fff27a"/>
+                <stop offset=".45" stop-color="#ffd22f"/>
+                <stop offset="1" stop-color="#e5a90f"/>
+              </linearGradient>
+            </defs>
+            <path d="M31 28c11 54 51 79 92 63 22-8 37-25 43-45-17 13-37 20-58 20-32 0-55-13-70-40z" fill="url(#bananaGold)" stroke="#7d5204" stroke-width="6" stroke-linejoin="round"/>
+            <path d="M32 29c9 4 17 5 24 3" fill="none" stroke="#f8e267" stroke-width="6" stroke-linecap="round" opacity=".8"/>
+            <path d="M28 28c-6-10-5-18 4-26 6 7 9 14 8 23" fill="#8a5e10" stroke="#4d3104" stroke-width="4"/>
+            <path d="M163 47c7-6 10-13 9-21 9 7 10 17 2 28" fill="#7b4b07" stroke="#4d3104" stroke-width="4"/>
+            <circle cx="74" cy="77" r="3" fill="#b57a0a" opacity=".55"/><circle cx="104" cy="82" r="2.5" fill="#b57a0a" opacity=".5"/>
+          </svg>
+          <div class="drag-hint">JOGUE A BANANA NO BRUNO</div>
         </div>
+
+        <div id="actionMessage" class="action-message"></div>
+        <div id="hitFlash" class="hit-flash"></div>
       </section>
-    </main>
-  </div>
 
-  <audio id="saxAudio" src="assets/sax-riff.wav" preload="auto"></audio>
+      <div class="bottom-bar">
+        <div class="mode-copy">
+          <span class="status-dot"></span>
+          <div><small id="modeLabel">MODO ARMAZÉM</small><strong id="modeAction">Bruno guarda o módulo na caixa</strong></div>
+        </div>
+        <button id="resetBtn" class="reset-btn" type="button">Zerar bananas</button>
+      </div>
+
+      <audio id="saxAudio" preload="auto" playsinline crossorigin="anonymous">
+        <source src="https://upload.wikimedia.org/wikipedia/commons/transcoded/4/4f/Stlouisblues-9bars.ogg/Stlouisblues-9bars.ogg.mp3" type="audio/mpeg" />
+        <source src="https://upload.wikimedia.org/wikipedia/commons/4/4f/Stlouisblues-9bars.ogg" type="audio/ogg" />
+      </audio>
+    </main>
+
+    <footer class="credits">Sax: trecho de “St. Louis Blues”, tenor sax por Julien Grandgagnage • CC BY-SA 3.0 • Wikimedia Commons</footer>
+  </div>
   <script src="app.js"></script>
 </body>
 </html>

@@ -1,12 +1,13 @@
 {
   "name": "Bruno — Gorila de Óculos",
-  "short_name": "Bruno Sax",
+  "short_name": "Bruno",
   "start_url": "./",
+  "scope": "./",
   "display": "standalone",
-  "background_color": "#05070b",
-  "theme_color": "#080b10",
-  "description": "Mini jogo do Bruno, o gorila de óculos, com armazém de telemetria e igreja do sax.",
+  "background_color": "#070a0e",
+  "theme_color": "#090c10",
+  "description": "Jogue a banana no Bruno e veja o gorila de óculos trabalhar com telemetria ou tocar sax.",
   "icons": [
-    { "src": "assets/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+    {"src":"assets/icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}
   ]
 }
