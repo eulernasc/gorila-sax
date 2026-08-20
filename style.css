@@ -44,3 +44,41 @@ main{padding:clamp(10px,2vw,24px)}.game{width:min(1480px,100%);min-height:calc(1
 @media(max-width:1000px){.rack{width:190px;height:280px}.shipping-box{right:8%}.telemetry-module{right:19%}.gorilla-wrap{width:min(460px,64vw)}.game.church .gorilla-wrap{width:min(500px,68vw)}.bruno-speech{right:-35px}}
 @media(max-width:900px){.topbar{grid-template-columns:1fr auto}.scene-switch{grid-column:1/-1;order:3;justify-self:stretch}.scene-btn{flex:1;justify-content:center}.scene-stage{min-height:650px}.rack{width:165px;height:255px;top:170px;opacity:.76}.shipping-box{right:5%}.telemetry-module{right:14%}.bruno-nameplate{top:7%}}
 @media(max-width:620px){main{padding:0}.game{min-height:calc(100vh - 118px);border-radius:0;border-left:0;border-right:0}.topbar{padding:9px 10px;gap:9px}.brand-mark{width:42px;height:42px}.brand-copy strong{font-size:14px}.brand-copy span{max-width:47vw;font-size:10px}.sound-btn{min-width:55px;padding:0 10px}.sound-btn #soundLabel{display:none}.hud{padding:10px 10px 0}.hud-pill{min-width:0;flex:1}.instructions{margin:8px 10px 0;font-size:12px}.scene-stage{min-height:615px}.warehouse-sign{top:55px;font-size:8px;max-width:62%;text-align:center}.warehouse-sign span{white-space:normal}.truck-silhouette{display:none}.rack{width:118px;height:220px;top:160px;opacity:.55;border-width:5px}.rack-header{display:none}.rack-level{border-bottom-width:4px;transform:scale(.83)}.gorilla-wrap{width:84vw;bottom:58px}.game.church .gorilla-wrap{width:87vw}.bruno-nameplate{top:13%;min-width:108px;padding:6px 9px}.bruno-nameplate span{font-size:11px}.bruno-speech{right:0;top:22%;font-size:14px;padding:11px 13px}.banana-home{left:1%;bottom:75px}.banana{width:94px}.drag-hint{font-size:7px;max-width:120px;text-align:center}.shipping-box{right:1%;bottom:90px;width:120px;height:88px}.telemetry-module{right:6%;bottom:195px;transform:scale(.82)}.telemetry-module.packed{transform:translate(75px,105px) scale(.45) rotate(10deg)}.bottom-panel{padding:12px 10px calc(12px + env(safe-area-inset-bottom))}.stained-glass{transform:scale(.7);transform-origin:top left}.sg-right{display:none}.cross-glow,.cross{right:7%}.altar{right:1%;width:150px}.church-arch.arch-c{display:none}.floor-marker{font-size:25px;right:3%;bottom:20px}}
+
+/* === v3: arte 2D refinada / Bruno === */
+.gorilla-wrap{width:min(510px,45vw);bottom:12px}
+.game.church .gorilla-wrap{width:min(535px,47vw)}
+.gorilla{filter:saturate(.96) contrast(1.03)}
+.gorilla-body{transform-origin:280px 430px;animation:brunoIdle 3.2s ease-in-out infinite}
+@keyframes brunoIdle{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-3px) scale(1.006)}}
+.gorilla-head{transform-origin:280px 240px;animation:headIdle 5.4s ease-in-out infinite}
+@keyframes headIdle{0%,44%,100%{transform:rotate(0)}48%{transform:rotate(-1.4deg)}53%{transform:rotate(1deg)}}
+.glasses-lens{animation:glassFlash 6.8s ease-in-out infinite}
+@keyframes glassFlash{0%,72%,100%{opacity:1}76%{opacity:.84}78%{opacity:1}}
+.fur-strokes{mix-blend-mode:screen}
+.game.sax-playing .gorilla-body{animation:brunoSaxBody .42s ease-in-out infinite alternate}
+.game.sax-playing .gorilla-head{animation:brunoSaxHead .42s ease-in-out infinite alternate}
+.game.sax-playing .sax-prop{animation:brunoSaxProp .42s ease-in-out infinite alternate;filter:drop-shadow(0 0 12px rgba(255,196,71,.32))}
+@keyframes brunoSaxBody{from{transform:rotate(-.7deg) translateY(0)}to{transform:rotate(.8deg) translateY(-3px)}}
+@keyframes brunoSaxHead{from{transform:rotate(-1deg)}to{transform:rotate(1.5deg)}}
+@keyframes brunoSaxProp{from{transform:rotate(-.9deg) translateY(0)}to{transform:rotate(1deg) translateY(-2px)}}
+.sax-prop{opacity:0;transform:translateY(14px) scale(.92);transform-origin:330px 420px;transition:opacity .26s ease,transform .3s ease}
+.game.church .sax-prop{opacity:1;transform:none}
+.banana-home{left:4.5%;bottom:52px}
+.banana{width:148px;filter:drop-shadow(0 15px 13px rgba(0,0,0,.34));transform-origin:center;transition:filter .16s ease,transform .16s ease}
+.banana:hover{transform:translateY(-6px) rotate(-2deg) scale(1.025);filter:drop-shadow(0 19px 16px rgba(0,0,0,.42))}
+.banana.dragging{transform:translate(-50%,-50%) scale(1.08) rotate(-5deg)}
+.drag-hint{font-size:9px;background:rgba(8,12,17,.84);border-color:rgba(255,211,86,.16);box-shadow:0 8px 18px rgba(0,0,0,.22)}
+/* igreja mais coerente com ilustração 2D */
+.church-scene{background:linear-gradient(180deg,#574536 0%,#4b392d 54%,#2b211b 100%)}
+.church-wall{filter:saturate(.86) contrast(1.04)}
+.church-aisle{opacity:.88;background:linear-gradient(180deg,rgba(111,50,37,.20),#633629)}
+.pews{filter:saturate(.85);opacity:.98}
+.stained-glass{box-shadow:inset 0 0 0 5px rgba(255,255,255,.14),0 0 36px rgba(255,209,115,.17)}
+/* armazém: contraste e desenho de chão mais limpo */
+.warehouse-scene{background:linear-gradient(#18222b 0 49%,#2b3036 49% 100%)}
+.warehouse-backwall{filter:contrast(1.04)}
+.rack{box-shadow:0 20px 35px rgba(0,0,0,.38),inset 0 0 0 1px rgba(255,255,255,.025)}
+.shipping-box{box-shadow:0 22px 44px rgba(0,0,0,.42)}
+@media(max-width:1000px){.gorilla-wrap{width:min(485px,67vw)}.game.church .gorilla-wrap{width:min(510px,70vw)}.banana{width:132px}}
+@media(max-width:620px){.gorilla-wrap{width:88vw;bottom:56px}.game.church .gorilla-wrap{width:91vw}.banana{width:104px}.banana-home{left:0;bottom:78px}}
