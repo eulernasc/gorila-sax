@@ -82,3 +82,31 @@ main{padding:clamp(10px,2vw,24px)}.game{width:min(1480px,100%);min-height:calc(1
 .shipping-box{box-shadow:0 22px 44px rgba(0,0,0,.42)}
 @media(max-width:1000px){.gorilla-wrap{width:min(485px,67vw)}.game.church .gorilla-wrap{width:min(510px,70vw)}.banana{width:132px}}
 @media(max-width:620px){.gorilla-wrap{width:88vw;bottom:56px}.game.church .gorilla-wrap{width:91vw}.banana{width:104px}.banana-home{left:0;bottom:78px}}
+
+
+/* ===== V4: Bruno 2D com proporções reais + assets CC0 ===== */
+.gorilla-wrap{width:min(515px,46vw);bottom:8px}
+.game.church .gorilla-wrap{width:min(535px,47vw)}
+.gorilla{display:block;width:100%;overflow:visible}
+.bruno-art{transform-box:fill-box;transform-origin:center bottom;animation:brunoV4Idle 3.4s ease-in-out infinite}
+@keyframes brunoV4Idle{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-3px) rotate(.25deg)}}
+.bruno-gorilla-art{filter:grayscale(1) brightness(.46) contrast(1.42) drop-shadow(0 12px 10px rgba(0,0,0,.22));transform-box:fill-box;transform-origin:center center}
+.glasses-overlay{transform-box:fill-box;transform-origin:center center}
+.sax-image-wrap{opacity:0;transform-box:fill-box;transform-origin:47% 23%;transition:opacity .24s ease,transform .28s ease;pointer-events:none}
+.game.church .sax-image-wrap{opacity:1}
+.sax-image{filter:saturate(1.08) contrast(1.04) drop-shadow(0 8px 8px rgba(0,0,0,.3))}
+.sax-hands{opacity:.98}
+.module-in-hand{opacity:1;transition:opacity .2s ease,transform .3s ease}
+.game.church .module-in-hand{opacity:0}
+.game.sax-playing .bruno-art{animation:brunoV4Sax .38s ease-in-out infinite alternate}
+.game.sax-playing .sax-image-wrap{animation:saxV4Pulse .38s ease-in-out infinite alternate;filter:drop-shadow(0 0 12px rgba(255,199,75,.28))}
+@keyframes brunoV4Sax{from{transform:rotate(-.8deg) translateY(0)}to{transform:rotate(.9deg) translateY(-3px)}}
+@keyframes saxV4Pulse{from{transform:rotate(-1deg) translateY(0)}to{transform:rotate(1.2deg) translateY(-2px)}}
+.game.packing .module-in-hand{animation:modulePackV4 .82s cubic-bezier(.2,.9,.25,1)}
+@keyframes modulePackV4{0%,100%{transform:translate(0,0) rotate(0)}45%{transform:translate(18px,22px) rotate(6deg)}}
+.banana{width:154px;cursor:grab;user-select:none;touch-action:none;filter:drop-shadow(0 14px 15px rgba(0,0,0,.35));transition:filter .15s,transform .15s}
+.banana-art{display:block;width:100%;height:auto;pointer-events:none;user-select:none;-webkit-user-drag:none}
+.banana:hover{transform:translateY(-5px) rotate(-3deg) scale(1.025);filter:drop-shadow(0 18px 18px rgba(0,0,0,.44))}
+.banana.dragging{transform:translate(-50%,-50%) scale(1.06) rotate(-6deg)}
+@media(max-width:1000px){.gorilla-wrap{width:min(490px,67vw)}.game.church .gorilla-wrap{width:min(510px,69vw)}.banana{width:138px}}
+@media(max-width:620px){.gorilla-wrap{width:90vw;bottom:52px}.game.church .gorilla-wrap{width:92vw}.banana{width:108px}.banana-home{left:0;bottom:78px}.bruno-nameplate{top:10%}}

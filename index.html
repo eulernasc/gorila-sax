@@ -126,174 +126,51 @@
 
             <svg class="gorilla" viewBox="0 0 560 640" role="img" aria-label="Bruno, o gorila de óculos animado em estilo 2D">
               <defs>
-                <linearGradient id="furMain" x1="0" y1="0" x2="1" y2="1">
-                  <stop offset="0" stop-color="#11161b"/>
-                  <stop offset=".34" stop-color="#343c45"/>
-                  <stop offset=".68" stop-color="#171c21"/>
-                  <stop offset="1" stop-color="#080b0e"/>
-                </linearGradient>
-                <linearGradient id="furEdge" x1="0" y1="0" x2="1" y2="0">
-                  <stop offset="0" stop-color="#3d4650"/>
-                  <stop offset=".5" stop-color="#20262d"/>
-                  <stop offset="1" stop-color="#0c1014"/>
-                </linearGradient>
-                <linearGradient id="faceSkin" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0" stop-color="#3c4249"/>
-                  <stop offset=".48" stop-color="#24292f"/>
-                  <stop offset="1" stop-color="#111419"/>
-                </linearGradient>
-                <linearGradient id="lens2d" x1="0" y1="0" x2="1" y2="1">
-                  <stop offset="0" stop-color="#b7d9ee" stop-opacity=".20"/>
-                  <stop offset=".45" stop-color="#24333f" stop-opacity=".08"/>
-                  <stop offset="1" stop-color="#8bb8d2" stop-opacity=".17"/>
-                </linearGradient>
-                <linearGradient id="brass2d" x1="0" y1="0" x2="1" y2="1">
-                  <stop offset="0" stop-color="#7b4505"/>
-                  <stop offset=".18" stop-color="#e7a823"/>
-                  <stop offset=".38" stop-color="#fff0a0"/>
-                  <stop offset=".58" stop-color="#c87a0c"/>
-                  <stop offset=".78" stop-color="#ffd96b"/>
-                  <stop offset="1" stop-color="#764107"/>
-                </linearGradient>
-                <linearGradient id="brassBell" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0" stop-color="#ffe79a"/>
-                  <stop offset=".32" stop-color="#d99519"/>
-                  <stop offset="1" stop-color="#6e3d07"/>
-                </linearGradient>
-                <filter id="shadow2d" x="-35%" y="-35%" width="170%" height="170%">
-                  <feDropShadow dx="0" dy="12" stdDeviation="13" flood-opacity=".42"/>
+                <filter id="brunoShadow" x="-35%" y="-35%" width="170%" height="170%">
+                  <feDropShadow dx="0" dy="14" stdDeviation="14" flood-opacity=".42"/>
                 </filter>
-                <filter id="goldGlow" x="-50%" y="-50%" width="200%" height="200%">
-                  <feDropShadow dx="0" dy="0" stdDeviation="4" flood-color="#ffc94e" flood-opacity=".36"/>
-                </filter>
+                <linearGradient id="glassesLens" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0" stop-color="#b9d8eb" stop-opacity=".27"/>
+                  <stop offset=".5" stop-color="#17232d" stop-opacity=".18"/>
+                  <stop offset="1" stop-color="#8fbad2" stop-opacity=".23"/>
+                </linearGradient>
               </defs>
 
-              <ellipse class="g-shadow" cx="280" cy="592" rx="212" ry="31" fill="#000" opacity=".34"/>
+              <ellipse class="g-shadow" cx="280" cy="590" rx="205" ry="28" fill="#000" opacity=".34"/>
 
-              <g class="gorilla-body" filter="url(#shadow2d)">
-                <!-- silhueta corporal larga e braços longos -->
-                <path class="gorilla-torso" d="M157 547c-15-65-13-137 1-190 18-67 64-108 122-108 60 0 108 43 126 111 14 53 15 124 0 187z" fill="url(#furMain)" stroke="#090c10" stroke-width="5"/>
-                <path d="M203 355c25-37 50-53 77-53 29 0 55 18 81 57-9 54-19 109-18 171H217c1-64-6-119-14-175z" fill="#20262d" opacity=".55"/>
-                <path d="M220 359c18-22 37-33 59-33 23 0 43 11 61 34-13 37-18 85-17 136H239c1-50-5-99-19-137z" fill="#30373f" opacity=".28"/>
+              <g class="bruno-art" filter="url(#brunoShadow)">
+                <image class="bruno-gorilla-art" href="assets/bruno-gorilla-base.png" x="50" y="36" width="460" height="573" preserveAspectRatio="xMidYMid meet"/>
 
-                <!-- braços: postura típica de gorila com apoio dos nós dos dedos -->
-                <g class="arm arm-left">
-                  <path d="M177 332c-48 21-79 66-88 135-8 58 4 101 37 116 28 13 58-1 68-29 7-18 2-42 8-67 8-38 25-70 48-94z" fill="url(#furEdge)" stroke="#0a0d11" stroke-width="5"/>
-                  <path d="M91 537c7-28 31-46 58-42 27 4 43 27 36 54-7 26-30 42-58 38-28-4-43-24-36-50z" fill="url(#faceSkin)" stroke="#0a0d11" stroke-width="4"/>
-                  <path d="M104 554c18-4 39-4 58 2" fill="none" stroke="#515a64" stroke-width="4" stroke-linecap="round" opacity=".45"/>
-                </g>
-                <g class="arm arm-right">
-                  <path d="M383 332c48 21 79 66 88 135 8 58-4 101-37 116-28 13-58-1-68-29-7-18-2-42-8-67-8-38-25-70-48-94z" fill="url(#furEdge)" stroke="#0a0d11" stroke-width="5"/>
-                  <path d="M469 537c-7-28-31-46-58-42-27 4-43 27-36 54 7 26 30 42 58 38 28-4 43-24 36-50z" fill="url(#faceSkin)" stroke="#0a0d11" stroke-width="4"/>
-                  <path d="M456 554c-18-4-39-4-58 2" fill="none" stroke="#515a64" stroke-width="4" stroke-linecap="round" opacity=".45"/>
+                <g class="warehouse-prop module-in-hand">
+                  <rect x="374" y="465" width="92" height="63" rx="12" fill="#101922" stroke="#f0642e" stroke-width="5"/>
+                  <rect x="388" y="480" width="29" height="10" rx="4" fill="#45db91"/>
+                  <circle cx="448" cy="486" r="5" fill="#f1c75b"/>
+                  <path d="M390 510h61" stroke="#74889b" stroke-width="5" stroke-linecap="round"/>
+                  <text x="420" y="504" fill="#dfe9f1" font-size="9" font-weight="900" text-anchor="middle">TM-500</text>
                 </g>
 
-                <!-- cabeça com topete/fur e orelhas -->
-                <ellipse cx="169" cy="223" rx="27" ry="36" fill="#171c21" stroke="#090c0f" stroke-width="5"/>
-                <ellipse cx="391" cy="223" rx="27" ry="36" fill="#171c21" stroke="#090c0f" stroke-width="5"/>
-                <path class="gorilla-head" d="M168 236c0-91 43-159 112-159 71 0 114 68 114 159 0 74-46 122-114 122-67 0-112-49-112-122z" fill="url(#furMain)" stroke="#080b0e" stroke-width="6"/>
-                <path d="M186 190c10-71 43-111 94-111 52 0 86 42 96 116-26-28-57-42-96-42-38 0-69 12-94 37z" fill="#0d1115"/>
-                <path d="M186 205c26-24 57-34 94-34 38 0 69 11 95 37-7 23-13 40-20 53-25-17-51-25-77-25-28 0-52 8-73 24-8-15-14-33-19-55z" fill="#22282f" opacity=".62"/>
-
-                <!-- face/muzzle realista 2D -->
-                <path d="M201 240c19-32 45-48 79-48 35 0 62 17 80 50 17 32 14 71-6 98-18 24-44 37-74 37-31 0-57-13-75-38-20-28-21-67-4-99z" fill="url(#faceSkin)" stroke="#101419" stroke-width="4"/>
-                <path class="brow" d="M211 231c19-18 41-25 65-22M349 231c-19-18-41-25-65-22" fill="none" stroke="#0d1014" stroke-width="14" stroke-linecap="round" opacity=".95"/>
-                <ellipse cx="241" cy="246" rx="13" ry="9" fill="#080a0d"/>
-                <ellipse cx="319" cy="246" rx="13" ry="9" fill="#080a0d"/>
-                <circle cx="244" cy="243" r="3.8" fill="#f4f7fa"/>
-                <circle cx="316" cy="243" r="3.8" fill="#f4f7fa"/>
-                <path d="M238 270c10-17 24-25 42-25 19 0 34 9 43 27l11 33c-12 21-31 31-55 31-25 0-44-11-55-32z" fill="#11151a" stroke="#080a0d" stroke-width="4"/>
-                <path d="M254 279c8-7 16-10 26-10s19 3 27 11l7 15c-10 8-21 12-34 12-13 0-24-4-34-12z" fill="#30363d" opacity=".8"/>
-                <ellipse cx="261" cy="287" rx="7" ry="5" fill="#0b0d10"/>
-                <ellipse cx="300" cy="287" rx="7" ry="5" fill="#0b0d10"/>
-                <path class="bruno-mouth" d="M241 321c12 10 25 15 39 15 15 0 29-5 41-15-9 27-29 40-41 40-13 0-32-13-39-40z" fill="#07090c"/>
-                <path d="M253 326c17 8 37 8 54 0" fill="none" stroke="#5b6168" stroke-width="3.5" stroke-linecap="round" opacity=".55"/>
-
-                <!-- óculos mais assentados no rosto -->
-                <g class="glasses-frame" fill="none" stroke="#05070a" stroke-width="11" stroke-linejoin="round">
-                  <rect x="185" y="213" width="93" height="71" rx="18"/>
-                  <rect x="282" y="213" width="93" height="71" rx="18"/>
-                  <path d="M278 238h5"/>
-                  <path d="M187 230l-42-13M374 230l42-13"/>
-                </g>
-                <g class="glasses-lens">
-                  <rect x="192" y="220" width="79" height="57" rx="13" fill="url(#lens2d)" stroke="#65717e" stroke-width="2.5"/>
-                  <rect x="289" y="220" width="79" height="57" rx="13" fill="url(#lens2d)" stroke="#65717e" stroke-width="2.5"/>
-                  <path d="M204 227h26" stroke="#fff" stroke-width="4" stroke-linecap="round" opacity=".16"/>
-                  <path d="M301 227h26" stroke="#fff" stroke-width="4" stroke-linecap="round" opacity=".16"/>
+                <g class="sax-prop sax-image-wrap">
+                  <image class="sax-image" href="assets/saxophone-cc0.png" x="278" y="234" width="148" height="345" preserveAspectRatio="xMidYMid meet"/>
+                  <g class="sax-hands" fill="#1a2026" stroke="#0a0d10" stroke-width="3">
+                    <ellipse cx="334" cy="372" rx="24" ry="18" transform="rotate(-13 331 325)"/>
+                    <ellipse cx="352" cy="458" rx="25" ry="18" transform="rotate(10 350 414)"/>
+                  </g>
                 </g>
 
-                <!-- pequenos fios de pelagem para quebrar o aspecto geométrico -->
-                <g class="fur-strokes" stroke="#59636c" stroke-width="3" stroke-linecap="round" opacity=".22">
-                  <path d="M177 172l-18-9M192 132l-13-15M224 101l-7-18M340 101l8-18M369 132l13-14M385 172l18-9"/>
-                  <path d="M142 384l-18 7M131 422l-19 10M418 384l18 7M429 422l19 10"/>
+                <g class="glasses-overlay">
+                  <path d="M176 185l-34-12M384 185l34-12" fill="none" stroke="#06090d" stroke-width="11" stroke-linecap="round"/>
+                  <rect x="176" y="162" width="99" height="68" rx="18" fill="url(#glassesLens)" stroke="#080b0f" stroke-width="11"/>
+                  <rect x="285" y="162" width="99" height="68" rx="18" fill="url(#glassesLens)" stroke="#080b0f" stroke-width="11"/>
+                  <path d="M275 187h10" stroke="#080b0f" stroke-width="10" stroke-linecap="round"/>
+                  <path d="M192 174h30M301 174h30" stroke="#d9edf8" stroke-width="4" stroke-linecap="round" opacity=".18"/>
                 </g>
-              </g>
-
-              <!-- SAX ALTO 2D: pescoço, corpo, curva inferior e campana -->
-              <g class="sax-prop" filter="url(#shadow2d)">
-                <path d="M326 306l-21-9" stroke="#2a1a0b" stroke-width="9" stroke-linecap="round"/>
-                <path d="M326 306c25 4 42 14 54 29 9 11 13 24 11 37" fill="none" stroke="url(#brass2d)" stroke-width="13" stroke-linecap="round"/>
-                <path d="M390 362c11 38 14 82 9 130-4 35-14 62-31 82" fill="none" stroke="url(#brass2d)" stroke-width="24" stroke-linecap="round" filter="url(#goldGlow)"/>
-                <path d="M368 574c-23 27-61 30-89 11-13-9-22-22-25-39" fill="none" stroke="url(#brass2d)" stroke-width="24" stroke-linecap="round"/>
-                <!-- bell flare -->
-                <path d="M253 525c-25 0-52 12-70 34-9 12-14 25-15 39 25 19 70 25 105 7 15-8 25-19 31-32-8-26-27-44-51-48z" fill="url(#brassBell)" stroke="#f8d77a" stroke-width="5"/>
-                <path d="M180 579c28 15 66 19 97 5" fill="none" stroke="#4b2a07" stroke-width="8" stroke-linecap="round" opacity=".7"/>
-                <ellipse cx="229" cy="575" rx="45" ry="18" fill="#5a3106" opacity=".42"/>
-                <!-- key rods -->
-                <path d="M372 381l-43 18M381 417l-47 17M384 455l-48 16M383 492l-48 15" stroke="#ffe28d" stroke-width="3.4" stroke-linecap="round"/>
-                <path d="M329 383v130" stroke="#84500a" stroke-width="4.2"/>
-                <g fill="#ffe8a2" stroke="#6a3c07" stroke-width="2.3">
-                  <circle cx="334" cy="397" r="7"/><circle cx="336" cy="434" r="7"/><circle cx="337" cy="472" r="7"/><circle cx="336" cy="509" r="7"/>
-                </g>
-                <!-- pearl touches / guard -->
-                <path d="M407 399c12 3 19 11 21 23M410 448c12 3 18 11 20 23" fill="none" stroke="#c68214" stroke-width="5" stroke-linecap="round"/>
-                <circle cx="392" cy="370" r="6" fill="#fff0b4" filter="url(#goldGlow)"/>
-              </g>
-
-              <g class="warehouse-prop" filter="url(#shadow2d)">
-                <rect x="365" y="474" width="98" height="64" rx="13" fill="#111922" stroke="#f0642e" stroke-width="5"/>
-                <path d="M380 471v-22h26v22" fill="none" stroke="#7f93a7" stroke-width="4"/>
-                <rect x="379" y="486" width="34" height="11" rx="4" fill="#45db91"/>
-                <circle cx="443" cy="492" r="6" fill="#f1c75b"/>
-                <path d="M379 516h71" stroke="#65798d" stroke-width="5" stroke-linecap="round"/>
-                <text x="415" y="510" fill="#d9e4ed" font-size="10" font-weight="900" text-anchor="middle">TM-500</text>
               </g>
             </svg>
           </div>
 
           <div id="bananaHome" class="banana-home">
             <div id="banana" class="banana" role="button" tabindex="0" aria-label="Banana. Arraste até Bruno.">
-              <svg viewBox="0 0 220 150" aria-hidden="true">
-                <defs>
-                  <linearGradient id="bananaSkin" x1="0" y1="0" x2="1" y2="1">
-                    <stop offset="0" stop-color="#b87905"/>
-                    <stop offset=".18" stop-color="#f1b61b"/>
-                    <stop offset=".46" stop-color="#ffe76d"/>
-                    <stop offset=".72" stop-color="#f5bd23"/>
-                    <stop offset="1" stop-color="#a86a04"/>
-                  </linearGradient>
-                  <linearGradient id="bananaHighlight" x1="0" y1="0" x2="1" y2="0">
-                    <stop offset="0" stop-color="#fff7b7" stop-opacity=".05"/>
-                    <stop offset=".45" stop-color="#fff9c9" stop-opacity=".78"/>
-                    <stop offset="1" stop-color="#fff7b7" stop-opacity=".08"/>
-                  </linearGradient>
-                </defs>
-                <!-- corpo espesso com concavidade típica de banana -->
-                <path d="M45 28c-12 17-15 42-6 66 13 36 48 57 86 54 39-3 73-27 91-62-27 21-55 28-83 23-32-5-55-24-67-53-5-12-8-22-9-31z" fill="url(#bananaSkin)" stroke="#6f4506" stroke-width="5" stroke-linejoin="round"/>
-                <!-- nervuras naturais -->
-                <path d="M58 48c12 31 36 50 68 56 29 5 57-1 80-18" fill="none" stroke="url(#bananaHighlight)" stroke-width="8" stroke-linecap="round"/>
-                <path d="M70 72c15 22 34 34 58 38" fill="none" stroke="#d89b11" stroke-width="2.8" stroke-linecap="round" opacity=".65"/>
-                <!-- talo -->
-                <path d="M47 31c-8-15-2-27 9-35" fill="none" stroke="#81520a" stroke-width="12" stroke-linecap="round"/>
-                <path d="M53 1c7 0 12 4 13 10" fill="none" stroke="#3f2a08" stroke-width="7" stroke-linecap="round"/>
-                <!-- ponta escura -->
-                <path d="M212 84c6-2 11-7 13-13" fill="none" stroke="#6d4508" stroke-width="10" stroke-linecap="round"/>
-                <circle cx="225" cy="69" r="4.5" fill="#2b1b07"/>
-                <!-- pequenas manchas -->
-                <circle cx="93" cy="111" r="2.4" fill="#8d5907" opacity=".55"/>
-                <circle cx="149" cy="112" r="2" fill="#8d5907" opacity=".45"/>
-              </svg>
+              <img class="banana-art" src="assets/banana-cc0.png" alt="" draggable="false" />
             </div>
             <div class="drag-hint">JOGUE A BANANA NO BRUNO</div>
           </div>
